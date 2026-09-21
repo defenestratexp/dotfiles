@@ -1,0 +1,112 @@
+# bashrc - Main bash configuration
+# This file bootstraps the shell by sourcing modular configuration files
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+#################
+### CORE PATH ###
+#################
+
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:$HOME/bin
+
+# Add Homebrew to PATH (macOS)
+if [ -d "/opt/homebrew/bin" ]; then
+    export PATH="/opt/homebrew/bin:$PATH"
+fi
+
+# Add ~/.local/bin to PATH
+if [ -d "$HOME/.local/bin" ]; then
+export PATH="$HOME/.local/bin:$PATH"
+fi
+
+##############
+### PROMPT ###
+##############
+
+# Green user@host, blue DIR, white command
+export PS1="\[\e[0;32m\][\u@\h] \[\e[0;34m\]DIR: \W\[\e[00m\] $: "
+
+###########################
+### SOURCE CONFIG FILES ###
+###########################
+
+# Location of the bash/ modules. Defaults to the directory this file really
+# lives in (so a ~/.bashrc symlink into a clone "just works"); override by
+# exporting DOTFILES_BASH before this file is read.
+if [ -z "$DOTFILES_BASH" ]; then
+    DOTFILES_BASH="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")")" && pwd)"
+fi
+SYSCONFIGS="$DOTFILES_BASH"
+
+# Source files in order (colors first so other scripts can use them)
+# Files that don't exist are silently skipped
+_source_if_exists() {
+    [[ -f "$1" ]] && source "$1"
+}
+
+# Core utilities (order matters)
+_source_if_exists "$SYSCONFIGS/bash_colors"      # Color variables and logging
+_source_if_exists "$SYSCONFIGS/bash_aliases"     # Common aliases
+_source_if_exists "$SYSCONFIGS/bash_functions"   # General utility functions
+_source_if_exists "$SYSCONFIGS/bash_system"      # System inspection functions
+_source_if_exists "$SYSCONFIGS/bash_security"    # Password/hash generation
+
+# Tool-specific
+_source_if_exists "$SYSCONFIGS/bash_docker"      # Docker utilities
+_source_if_exists "$SYSCONFIGS/bash_git"         # Git shortcuts
+
+# Environment-specific
+_source_if_exists "$SYSCONFIGS/bash_languages"   # Language configs (Ruby, Python, Go, etc.)
+_source_if_exists "$SYSCONFIGS/bash_utilities"   # Tool configs (Alacritty, Neovim, etc.)
+_source_if_exists "$SYSCONFIGS/bash_pipeline"    # CI/CD aliases
+
+# Cleanup helper function
+unset -f _source_if_exists
+
+#####################
+### LOCAL CONFIGS ###
+#####################
+
+# Keychain (SSH agent)
+if [ -f "$HOME/.mykeychain" ]; then
+    source "$HOME/.mykeychain"
+fi
+
+###############
+### EXPORTS ###
+###############
+
+# AWS ECR registry - set the real value in ~/.bashrc.local, e.g.:
+# export ECR_REGISTRY="123456789012.dkr.ecr.us-west-2.amazonaws.com"
+
+###################
+### COMPLETIONS ###
+###################
+
+# Terraform
+if command -v terraform >/dev/null 2>&1; then
+    complete -C "$(command -v terraform)" terraform
+fi
+
+# Direnv
+if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook bash)"
+fi
+
+################
+### LISTINGS ###
+################
+
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+#####################
+### MACHINE-LOCAL ###
+#####################
+
+# Private or host-specific settings (registry names, DOCKER_HOST, work
+# aliases, tokens loaded from a keychain...) go in an untracked file that is
+# never committed to this repo. Sourced last so it can override anything above.
+[ -f "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"

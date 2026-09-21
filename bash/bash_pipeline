@@ -1,0 +1,7 @@
+alias molecule="docker run --rm -it \
+    -v \$(pwd):/workspace \
+    -w /workspace \
+    defenestratexp/ansible-molecule-alpine molecule"
+
+alias fixmolecule="sudo chown -R \$(id -u):\$(id -g) \$(pwd)"
+

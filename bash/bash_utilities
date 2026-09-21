@@ -1,0 +1,43 @@
+# bash_utilities - Tool-specific configurations
+# Sourced by bashrc
+
+#################
+### ALACRITTY ###
+#################
+
+ALACRITTY_BIN="$(command -v alacritty 2>/dev/null)"
+
+if [ -n "$ALACRITTY_BIN" ]; then
+    mkdir -p "$HOME/.bash_completion"
+
+    # Try to use completions from a source checkout first (set ALACRITTY_SRC)
+    ALACRITTY_SRC="${ALACRITTY_SRC:-$HOME/src/alacritty}"
+    if [ -f "$ALACRITTY_SRC/extra/completions/alacritty.bash" ]; then
+        cp "$ALACRITTY_SRC/extra/completions/alacritty.bash" "$HOME/.bash_completion/alacritty" 2>/dev/null
+        source "$HOME/.bash_completion/alacritty" 2>/dev/null
+    elif [ -f "/usr/share/bash-completion/completions/alacritty" ]; then
+        source "/usr/share/bash-completion/completions/alacritty" 2>/dev/null
+    fi
+fi
+
+##############
+### NEOVIM ###
+##############
+
+if [ -d /opt/nvim-linux64 ]; then
+    export PATH="$PATH:/opt/nvim-linux64/bin"
+    alias vim='nvim'
+elif [ -d /opt/nvim-linux-x86_64 ]; then
+    export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+    alias vim='nvim'
+fi
+
+###########
+### NVM ###
+###########
+
+if [ -d "$HOME/.nvm" ]; then
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+fi

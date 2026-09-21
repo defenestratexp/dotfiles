@@ -1,0 +1,6 @@
+# vim swap files
+.sw*
+*.swp
+
+# machine-local overrides never belong in the repo
+*.local

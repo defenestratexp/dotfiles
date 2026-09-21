@@ -1,0 +1,67 @@
+# bash_languages - Language-specific configurations
+# Sourced by bashrc
+
+############
+### RUBY ###
+############
+
+if [ -d "$HOME/.rbenv/bin" ]; then
+    export PATH="$PATH:$HOME/.rbenv/bin"
+fi
+
+if [ -d "$HOME/.rbenv/shims" ]; then
+    export PATH="$PATH:$HOME/.rbenv/shims"
+fi
+
+if [ ! -f "$HOME/.gemrc" ]; then
+    echo "gem: --no-document" > ~/.gemrc
+fi
+
+if command -v rbenv >/dev/null 2>&1; then
+    eval "$(rbenv init -)"
+fi
+
+#########################
+### PYTHON/VIRTUALENV ###
+#########################
+
+if [ -d "$HOME/.virtualenvs" ]; then
+    export WORKON_HOME="$HOME/.virtualenvs"
+    export PROJECT_HOME="${PROJECT_HOME:-$HOME/projects}"
+    export PATH="/usr/local/bin:$PATH"
+    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+    export VIRTUALENVWRAPPER_VIRTUALENV=/usr/local/bin/virtualenv
+
+    if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+        source /usr/local/bin/virtualenvwrapper.sh 2>/dev/null
+    fi
+fi
+
+##########
+### GO ###
+##########
+
+if [ -d "/usr/local/go" ]; then
+    export GOPATH="${GOPATH:-$HOME/go}"
+    export PATH="$PATH:$GOPATH/bin"
+    export PATH="$PATH:/usr/local/go/bin"
+fi
+
+############
+### RUST ###
+############
+
+# (Alacritty completions are handled in bash_utilities)
+if [ -d "$HOME/.cargo" ]; then
+    source "$HOME/.cargo/env" 2>/dev/null
+fi
+
+############
+### LVIM ###
+############
+
+if [ ! -d "$HOME/.local/bin" ]; then
+    mkdir -p "$HOME/.local/bin"
+fi
+
+export PATH="$PATH:$HOME/.local/bin"
