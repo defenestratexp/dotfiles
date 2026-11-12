@@ -1,0 +1,43 @@
+# Renders only inside the N9N d2 pipeline (filer icon library + lib/style.d2); docs/diagrams/layout.png is the published image.
+...@../../lib/style.d2
+...@/mnt/n9n/assets/icons/d2/simple.d2
+...@/mnt/n9n/assets/icons/d2/tabler.d2
+
+vars: {d2-config: {layout-engine: elk}}
+
+direction: right
+
+title: "dotfiles — what goes where, and the order bash loads it" {class: title}
+
+repo: "git clone\ndefenestratexp/dotfiles\n→ ~/.dotfiles" {class: [svc; simple-github]}
+
+home: "Your home directory (README install steps)" {
+  class: zone
+  vimrc: "~/.vimrc → vimrc\nVundle plugins: NERDTree\n(C-n), CtrlP, airline,\nSyntastic, xoria256,\nvim-terraform (fmt on save);\n4-space Python + Terraform,\n2-space JS, HTML, CSS,\nshell, Ruby" {class: [svc; simple-vim]}
+  tmux: "~/.tmux.conf → tmux.conf\nsmall single file: mouse on,\n| and - split, Alt+arrows\nmove panes, prefix r reloads" {class: [svc; simple-tmux]}
+  git: "git core.excludesfile\n→ gitignore (global)" {class: [small; simple-git]}
+  bashrc: "~/.bashrc → bash/bashrc\nentry point; loads the\nbash/ modules (below)" {class: [svc; simple-gnubash]}
+}
+
+vundle: "Vundle.vim cloned to\n~/.vim/bundle, then\nvim +PluginInstall +qall" {class: [small; tabler-download]}
+profiles: "tmuxprofile/ session layouts\n(not linked by the install)\ndevops.sh, operations,\ndevops.session.sh (tmuxifier)" {class: [small; tabler-layout-dashboard]}
+
+repo -> home.bashrc: "ln -sf" {class: flow}
+repo -> home.vimrc: "ln -sf" {class: flow}
+repo -> home.tmux: "ln -sf" {class: flow}
+repo -> home.git: "git config" {class: flow}
+vundle -> home.vimrc: plugins {class: async}
+
+load: "bash/bashrc, top to bottom (each module is skipped if missing)" {
+  class: zone
+  near: bottom-center
+  grid-columns: 6
+  grid-gap: 46
+  path: "1. PATH reset,\nthen /opt/homebrew/bin\nand ~/.local/bin" {class: [small; tabler-route]}
+  find: "2. prompt; find the\nmodules: DOTFILES_BASH,\nor follow bashrc's\nown symlink" {class: [small; tabler-file-symlink]}
+  modules: "3. bash_colors → aliases\n→ functions → system\n→ security → docker → git\n→ languages → utilities\n→ pipeline" {class: [svc; simple-gnubash]}
+  keychain: "4. ~/.mykeychain\nif present\n(SSH agent)" {class: [small; tabler-key]}
+  compl: "5. completions:\nterraform, direnv hook;\nll / la / l aliases" {class: [small; tabler-terminal-2]}
+  local: "6. ~/.bashrc.local\nuntracked, per machine:\naccount ids, registries,\nwork aliases; overrides all" {class: [small; tabler-lock]}
+  path -> find -> modules -> keychain -> compl -> local {class: flow}
+}

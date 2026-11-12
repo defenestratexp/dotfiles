@@ -15,6 +15,10 @@ tmuxprofile/        a few tmux session layouts
 gitignore           global gitignore
 ```
 
+![Where each file lands, and the order bashrc loads the modules](docs/diagrams/layout.png)
+
+*Where each file lands, and the order `bashrc` loads the modules.*
+
 ## Install
 
 ```sh
